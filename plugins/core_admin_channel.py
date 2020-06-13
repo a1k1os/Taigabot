@@ -22,7 +22,7 @@ def compare_hostmasks(hostmask, matchmasks):
     for mask in re.findall(r'(\b\S+\b)', ' '.join(matchmasks)):
         mask = '^*{}$'.format(mask).replace('.', '\.').replace('*', '.*')
         if bool(re.match(mask, hostmask)):
-            print '{} - {}'.format(mask, hostmask)
+            print('{} - {}'.format(mask, hostmask))
             return True
     return False
 
@@ -66,8 +66,8 @@ def match(inp, nick=None, chan=None, bot=None, input=None, db=None):
 def admins(inp, notice=None, bot=None, chan=None, db=None):
     """admins [channel] -- Lists admins on channel."""
     admins = database.get(db, 'channels', 'admins', 'chan', chan)
-    if admins: notice(u"[{}]: Admins are: {}".format(chan, admins))
-    else: notice(u"[{}]: No nicks/hosts are currently admins.".format(chan))
+    if admins: notice("[{}]: Admins are: {}".format(chan, admins))
+    else: notice("[{}]: No nicks/hosts are currently admins.".format(chan))
     return
 
 
@@ -85,16 +85,16 @@ def admin(inp, notice=None, bot=None, chan=None, db=None):
         for nick in nicks:
             nick = user.get_hostmask(nick, db)
             if admins and nick in admins:
-                notice(u"[{}]: {} is already an admin.".format(chan, nick))
+                notice("[{}]: {} is already an admin.".format(chan, nick))
             else:
                 admins = '{} {}'.format(nick, admins).replace('False',
                                                               '').strip()
                 database.set(db, 'channels', 'admins', admins, 'chan', chan)
-                notice(u"[{}]: {} is now an admin.".format(chan, nick))
+                notice("[{}]: {} is now an admin.".format(chan, nick))
     elif 'del' in command:
         if '*' in nicks:
             database.set(db, 'channels', 'admins', '', 'chan', chan)
-            notice(u"[{}]: All admins have been removed.".format(chan))
+            notice("[{}]: All admins have been removed.".format(chan))
         else:
             for nick in nicks:
                 nick = user.get_hostmask(nick, db)
@@ -103,10 +103,10 @@ def admin(inp, notice=None, bot=None, chan=None, db=None):
                         admins.replace(nick, '').strip().split())
                     database.set(db, 'channels', 'admins', admins, 'chan',
                                  chan)
-                    notice(u"[{}]: {} is no longer an admin.".format(
+                    notice("[{}]: {} is no longer an admin.".format(
                         chan, nick))
                 else:
-                    notice(u"[{}]: {} is not an admin.".format(chan, nick))
+                    notice("[{}]: {} is not an admin.".format(chan, nick))
     return
 
 
@@ -135,21 +135,21 @@ def autoop(inp, notice=None, bot=None, chan=None, db=None):
     command = inp.split()[0]
     if 'enable' in command:
         database.set(db, 'channels', 'autoop', True, 'chan', chan)
-        notice(u"[{}]: Autoops is now enabled.".format(chan))
+        notice("[{}]: Autoops is now enabled.".format(chan))
     elif 'disable' in command:
         database.set(db, 'channels', 'autoop', False, 'chan', chan)
-        notice(u"[{}]: Autoops is now disabled.".format(chan))
+        notice("[{}]: Autoops is now disabled.".format(chan))
     elif 'add' in command:
         nicks = inp.split()[1:]
         for nick in nicks:
             nick = user.get_hostmask(nick, db)
             if autoops and nick in autoops:
-                notice(u"[{}]: {} is already an autoop.".format(chan, nick))
+                notice("[{}]: {} is already an autoop.".format(chan, nick))
             else:
                 autoops = '{} {}'.format(nick, autoops).replace('False',
                                                                 '').strip()
                 database.set(db, 'channels', 'autoops', autoops, 'chan', chan)
-                notice(u"[{}]: {} is now an auto op.".format(chan, nick))
+                notice("[{}]: {} is now an auto op.".format(chan, nick))
     elif 'del' in command:
         nicks = inp.split()[1:]
         for nick in nicks:
@@ -157,10 +157,10 @@ def autoop(inp, notice=None, bot=None, chan=None, db=None):
             if autoops and nick in autoops:
                 autoops = " ".join(autoops.replace(nick, '').strip().split())
                 database.set(db, 'channels', 'autoops', autoops, 'chan', chan)
-                notice(u"[{}]: {} is no longer an auto op.".format(
+                notice("[{}]: {} is no longer an auto op.".format(
                     chan, nick))
             else:
-                notice(u"[{}]: {} is not an auto op.".format(chan, nick))
+                notice("[{}]: {} is not an auto op.".format(chan, nick))
     return
 
 
@@ -174,9 +174,9 @@ def ignored(inp, notice=None, bot=None, chan=None, db=None):
     """ignored [channel]-- Lists ignored channels/nicks/hosts."""
     ignorelist = database.get(db, 'channels', 'ignored', 'chan', chan)
     if ignorelist:
-        notice(u"[{}]: Ignored nicks/hosts are: {}".format(chan, ignorelist))
+        notice("[{}]: Ignored nicks/hosts are: {}".format(chan, ignorelist))
     else:
-        notice(u"[{}]: No nicks/hosts are currently ignored.".format(chan))
+        notice("[{}]: No nicks/hosts are currently ignored.".format(chan))
     return
 
 
@@ -189,17 +189,17 @@ def ignore(inp, notice=None, bot=None, chan=None, db=None):
     for target in targets:
         target = user.get_hostmask(target, db)
         if (user.is_admin(target, chan, db, bot)):
-            notice(u"[{}]: {} is an admin and cannot be ignored.".format(
+            notice("[{}]: {} is an admin and cannot be ignored.".format(
                 chan, inp))
         else:
             if ignorelist and target in ignorelist:
-                notice(u"[{}]: {} is already ignored.".format(chan, target))
+                notice("[{}]: {} is already ignored.".format(chan, target))
             else:
                 ignorelist = '{} {}'.format(target, ignorelist)
                 database.set(db, 'channels', 'ignored', ignorelist, 'chan',
                              chan)
 
-                notice(u"[{}]: {} has been ignored.".format(chan, target))
+                notice("[{}]: {} has been ignored.".format(chan, target))
     return
 
 
@@ -215,9 +215,9 @@ def unignore(inp, notice=None, bot=None, chan=None, db=None):
             ignorelist = " ".join(
                 ignorelist.replace(target, '').strip().split())
             database.set(db, 'channels', 'ignored', ignorelist, 'chan', chan)
-            notice(u"[{}]: {} has been unignored.".format(chan, target))
+            notice("[{}]: {} has been unignored.".format(chan, target))
         else:
-            notice(u"[{}]: {} is not ignored.".format(chan, target))
+            notice("[{}]: {} is not ignored.".format(chan, target))
     return
 
 
@@ -232,10 +232,10 @@ def disabled(inp, notice=None, bot=None, chan=None, db=None):
     disabledcommands = database.get(db, 'channels', 'disabled', 'chan', chan)
     disabledglobalcommands = " ".join(bot.config["disabled_commands"])
     if disabledcommands:
-        notice(u"[{}]: Disabled commands: Chan: {}, Global: {}".format(
+        notice("[{}]: Disabled commands: Chan: {}, Global: {}".format(
             chan, disabledcommands, disabledglobalcommands))
     else:
-        notice(u"[{}]: No commands are currently disabled.".format(chan))
+        notice("[{}]: No commands are currently disabled.".format(chan))
     return
 
 
@@ -249,15 +249,15 @@ def disable(inp, notice=None, bot=None, chan=None, db=None):
     targets = inp.split()
     for target in targets:
         if disabledcommands and target in disabledcommands:
-            notice(u"[{}]: {} is already disabled.".format(chan, target))
+            notice("[{}]: {} is already disabled.".format(chan, target))
         else:
             if 'disable' in target or 'enable' in target or 'core_admin' in target or 'plez' in target:
-                notice(u"[{}]: {} cannot be disabled.".format(chan, target))
+                notice("[{}]: {} cannot be disabled.".format(chan, target))
             else:
                 disabledcommands = '{} {}'.format(target, disabledcommands)
                 database.set(db, 'channels', 'disabled', disabledcommands,
                              'chan', chan)
-                notice(u"[{}]: {} has been disabled.".format(chan, target))
+                notice("[{}]: {} has been disabled.".format(chan, target))
     return
 
 
@@ -271,7 +271,7 @@ def enable(inp, notice=None, bot=None, chan=None, db=None):
     targets = inp.split()
     if 'all' in targets or '*' in targets:
         database.set(db, 'channels', 'disabled', '', 'chan', chan)
-        notice(u"[{}]: All commands are now enabled.".format(chan))
+        notice("[{}]: All commands are now enabled.".format(chan))
     else:
         for target in targets:
             if disabledcommands and target in disabledcommands:
@@ -284,16 +284,16 @@ def enable(inp, notice=None, bot=None, chan=None, db=None):
                                                      '').strip().split())
                         database.set(db, 'channels', 'disabled',
                                      disabledcommands, 'chan', chan)
-                        notice(u"[{}]: {} is now enabled.".format(
+                        notice("[{}]: {} is now enabled.".format(
                             chan, target))
                     else:
                         pass
             else:
                 if target in " ".join(bot.config["disabled_commands"]):
-                    notice(u"[{}]: {} is globally disabled. Use .genable {} to enable."
+                    notice("[{}]: {} is globally disabled. Use .genable {} to enable."
                            .format(chan, target, target))
                 else:
-                    notice(u"[{}]: {} is not disabled.".format(chan, target))
+                    notice("[{}]: {} is not disabled.".format(chan, target))
     return
 
 
@@ -308,15 +308,15 @@ def disablehash(inp, notice=None, bot=None, chan=None, db=None):
     targets = inp.split()
     for target in targets:
         if disabledhashes and target in disabledhashes:
-            notice(u"[{}]: {} is already disabled.".format(chan, target))
+            notice("[{}]: {} is already disabled.".format(chan, target))
         else:
             if 'disable' in target or 'enable' in target:
-                notice(u"[{}]: {} cannot be disabled.".format(chan, target))
+                notice("[{}]: {} cannot be disabled.".format(chan, target))
             else:
                 disabledhashes = '{} {}'.format(target, disabledhashes)
                 database.set(db, 'channels', 'disabledhashes', disabledhashes,
                              'chan', chan)
-                notice(u"[{}]: {} has been disabled.".format(chan, target))
+                notice("[{}]: {} has been disabled.".format(chan, target))
     return
 
 
@@ -327,9 +327,9 @@ def disabledhashes(inp, notice=None, bot=None, chan=None, db=None):
     disabledhashes = database.get(db, 'channels', 'disabledhashes', 'chan',
                                   chan)
     if disabledhashes:
-        notice(u"[{}]: Disabled hashtags: {}".format(chan, disabledhashes))
+        notice("[{}]: Disabled hashtags: {}".format(chan, disabledhashes))
     else:
-        notice(u"[{}]: No hashtags are currently disabled.".format(chan))
+        notice("[{}]: No hashtags are currently disabled.".format(chan))
     return
 
 
@@ -344,7 +344,7 @@ def enablehash(inp, notice=None, bot=None, chan=None, db=None):
     targets = inp.split()
     if 'all' in targets or '*' in targets:
         database.set(db, 'channels', 'disabledhashes', '', 'chan', chan)
-        notice(u"[{}]: All commands are now enabled.".format(chan))
+        notice("[{}]: All commands are now enabled.".format(chan))
     else:
         for target in targets:
             if disabledhashes and target in disabledhashes:
@@ -352,9 +352,9 @@ def enablehash(inp, notice=None, bot=None, chan=None, db=None):
                     disabledhashes.replace(target, '').strip().split())
                 database.set(db, 'channels', 'disabledhashes', disabledhashes,
                              'chan', chan)
-                notice(u"[{}]: {} is now enabled.".format(chan, target))
+                notice("[{}]: {} is now enabled.".format(chan, target))
             else:
-                notice(u"[{}]: {} is not disabled.".format(chan, target))
+                notice("[{}]: {} is not disabled.".format(chan, target))
     return
 
 
@@ -368,21 +368,21 @@ def showfloods(inp, chan=None, notice=None, db=None):
 
     flood = database.get(db, 'channels', 'flood', 'chan', chan)
     if flood:
-        notice(u"[{}]: Flood: {} messages in {} seconds".format(
+        notice("[{}]: Flood: {} messages in {} seconds".format(
             chan,
             flood.split()[0],
             flood.split()[1]))
     else:
-        notice(u"[{}]: Flood protection is disabled.".format(chan))
+        notice("[{}]: Flood protection is disabled.".format(chan))
 
     cmdflood = database.get(db, 'channels', 'cmdflood', 'chan', chan)
     if cmdflood:
-        notice(u"[{}]: Command Flood: {} commands in {} seconds".format(
+        notice("[{}]: Command Flood: {} commands in {} seconds".format(
             chan,
             cmdflood.split()[0],
             cmdflood.split()[1]))
     else:
-        notice(u"[{}]: Command Flood protection is disabled.".format(chan))
+        notice("[{}]: Command Flood protection is disabled.".format(chan))
     return
 
 
@@ -394,22 +394,22 @@ def flood(inp, conn=None, chan=None, notice=None, db=None):
     if len(inp) == 0:
         floods = database.get(db, 'channels', 'flood', 'chan', chan)
         if floods:
-            notice(u"[{}]: Flood: {} messages in {} seconds".format(
+            notice("[{}]: Flood: {} messages in {} seconds".format(
                 chan,
                 floods.split()[0],
                 floods.split()[1]))
         else:
-            notice(u"[{}]: Flood is disabled.".format(chan))
+            notice("[{}]: Flood is disabled.".format(chan))
             notice(flood.__doc__)
     elif "disable" in inp:
         database.set(db, 'channels', 'flood', None, 'chan', chan)
-        notice(u"[{}]: Flood Protection Disabled.".format(chan))
+        notice("[{}]: Flood Protection Disabled.".format(chan))
     else:
         flood_num = inp.split()[0]
         flood_duration = inp.split()[1]
         floods = '{} {}'.format(flood_num, flood_duration)
         database.set(db, 'channels', 'flood', floods, 'chan', chan)
-        notice(u"[{}]: Flood Protection limited to {} messages in {} seconds."
+        notice("[{}]: Flood Protection limited to {} messages in {} seconds."
                .format(chan, flood_num, flood_duration))
     return
 
@@ -422,22 +422,22 @@ def cmdflood(inp, conn=None, chan=None, notice=None, db=None):
     if len(inp) == 0:
         floods = database.get(db, 'channels', 'cmdflood', 'chan', chan)
         if floods:
-            notice(u"[{}]: Command Flood: {} commands in {} seconds".format(
+            notice("[{}]: Command Flood: {} commands in {} seconds".format(
                 chan,
                 floods.split()[0],
                 floods.split()[1]))
         else:
-            notice(u"[{}]: CMD Flood is disabled.".format(chan))
+            notice("[{}]: CMD Flood is disabled.".format(chan))
             notice(cmdflood.__doc__)
     elif "disable" in inp:
         database.set(db, 'channels', 'cmdflood', None, 'chan', chan)
-        notice(u"[{}]: Command Flood Protection Disabled.".format(chan))
+        notice("[{}]: Command Flood Protection Disabled.".format(chan))
     else:
         flood_num = inp.split()[0]
         flood_duration = inp.split()[1]
         floods = '{} {}'.format(flood_num, flood_duration)
         database.set(db, 'channels', 'cmdflood', floods, 'chan', chan)
-        notice(u"[{}]: Command Flood Protection limited to {} commands in {} seconds."
+        notice("[{}]: Command Flood Protection limited to {} commands in {} seconds."
                .format(chan, flood_num, flood_duration))
     return
 
@@ -454,9 +454,9 @@ def badwords(inp, notice=None, bot=None, chan=None, db=None):
     if len(inp) == 0 or 'list' in inp:
         badwordlist = database.get(db, 'channels', 'badwords', 'chan', chan)
         if badwordlist:
-            notice(u"[{}]: Bad words: {}".format(chan, badwordlist))
+            notice("[{}]: Bad words: {}".format(chan, badwordlist))
         else:
-            notice(u"[{}]: No bad words in list.".format(chan))
+            notice("[{}]: No bad words in list.".format(chan))
             notice(badwords.__doc__)
     elif 'add' or 'del' in inp:
         command = inp.split(' ')[0].strip()
@@ -466,22 +466,22 @@ def badwords(inp, notice=None, bot=None, chan=None, db=None):
         if 'add' in command:
             for target in targets:
                 if badwordlist and target in badwordlist:
-                    notice(u"[{}]: {} is already a bad word.".format(
+                    notice("[{}]: {} is already a bad word.".format(
                         chan, target))
                 else:
                     if len(target) < 3:
-                        notice(u"[{}]: badwords must be longer than 3 characters. ({})"
+                        notice("[{}]: badwords must be longer than 3 characters. ({})"
                                .format(chan, target))
                     else:
                         badwordlist = '{} {}'.format(target, badwordlist)
                         database.set(db, 'channels', 'badwords', badwordlist,
                                      'chan', chan)
-                        notice(u"[{}]: {} has been added to the bad word list."
+                        notice("[{}]: {} has been added to the bad word list."
                                .format(chan, target))
         elif 'del' in command:
             if 'all' in targets or '*' in targets:
                 database.set(db, 'channels', 'badwords', '', 'chan', chan)
-                notice(u"[{}]: All bad words have been removed.".format(chan))
+                notice("[{}]: All bad words have been removed.".format(chan))
             else:
                 for target in targets:
                     if badwordlist and target in badwordlist:
@@ -489,10 +489,10 @@ def badwords(inp, notice=None, bot=None, chan=None, db=None):
                             badwordlist.replace(target, '').strip().split())
                         database.set(db, 'channels', 'badwords', badwordlist,
                                      'chan', chan)
-                        notice(u"[{}]: {} is no longer a bad word.".format(
+                        notice("[{}]: {} is no longer a bad word.".format(
                             chan, target))
                     else:
-                        notice(u"[{}]: {} is not a bad word.".format(
+                        notice("[{}]: {} is not a bad word.".format(
                             chan, target))
     else:
         notice(badwords.__doc__)
@@ -512,18 +512,18 @@ def trim(inp, conn=None, chan=None, notice=None, db=None):
     if len(inp) == 0:
         trimlength = database.get(db, 'channels', 'trimlength', 'chan', chan)
         if trimlength:
-            notice(u"[{}]: Trim output set to {} characters.".format(
+            notice("[{}]: Trim output set to {} characters.".format(
                 chan, trimlength))
         else:
-            notice(u"[{}]: Trim is disabled.".format(chan))
+            notice("[{}]: Trim is disabled.".format(chan))
             notice(trim.__doc__)
     elif "disable" in inp or "0 " in inp:
         database.set(db, 'channels', 'trimlength', None, 'chan', chan)
-        notice(u"[{}]: Trim Disabled.".format(chan))
+        notice("[{}]: Trim Disabled.".format(chan))
     else:
         trimlength = inp.strip()
         database.set(db, 'channels', 'trimlength', trimlength, 'chan', chan)
-        notice(u"[{}]: Trim output set to {} characters.".format(
+        notice("[{}]: Trim output set to {} characters.".format(
             chan, trimlength))
     return
 
@@ -537,8 +537,8 @@ def mode_cmd_channel(mode, text, inp, chan, conn, notice):
     channels = inp.split(' ')
     for channel in channels:
         if not channel: channel = chan
-        notice(u"Attempting to {} {}...".format(text, channel))
-        conn.send(u"MODE {} {}".format(channel, mode))
+        notice("Attempting to {} {}...".format(text, channel))
+        conn.send("MODE {} {}".format(channel, mode))
 
 
 @hook.command(permissions=["op_topic", "op"], channeladminonly=True)
@@ -546,7 +546,7 @@ def topic(inp, conn=None, chan=None):
     """topic [channel] <topic> -- Change the topic of a channel."""
     split = inp.split(" ")
     message = " ".join(split)
-    conn.send(u"TOPIC {} :{}".format(chan, message))
+    conn.send("TOPIC {} :{}".format(chan, message))
 
 
 @hook.command(
@@ -580,9 +580,9 @@ def shutup(inp, conn=None, chan=None, notice=None):
         users = inp.split(" ")[1:]
 
     for user in users:
-        out = u"MODE %s +m-voh %s %s %s" % (chan, user, user, user)
+        out = "MODE %s +m-voh %s %s %s" % (chan, user, user, user)
         conn.send(out)
-        notice(u"Shut up %s from %s..." % (user, chan))
+        notice("Shut up %s from %s..." % (user, chan))
 
 
 @hook.command(adminonly=True)
@@ -596,9 +596,9 @@ def speak(inp, conn=None, chan=None, notice=None):
         users = inp.split(" ")[1:]
 
     for user in users:
-        out = u"MODE %s -m" % (chan)
+        out = "MODE %s -m" % (chan)
         conn.send(out)
-        notice(u"hey %s you can speak in %s again" % (user, chan))
+        notice("hey %s you can speak in %s again" % (user, chan))
 
 
 @hook.command(
@@ -629,11 +629,11 @@ def mode_cmd(mode, text, inp, chan, conn, notice):
     targets = inp.split(" ")
     for target in targets:
         if notice is None:
-            conn.send(u"MODE {} {} {}".format(chan, mode, target))
+            conn.send("MODE {} {} {}".format(chan, mode, target))
             pass
         else:
-            notice(u"Attempting to {} {} in {}...".format(text, target, chan))
-            conn.send(u"MODE {} {} {}".format(chan, mode, target))
+            notice("Attempting to {} {} in {}...".format(text, target, chan))
+            conn.send("MODE {} {} {}".format(chan, mode, target))
     return
 
 
@@ -648,8 +648,8 @@ def mode_cmd(mode, text, inp, chan, conn, notice):
 def bans(inp, notice=None, bot=None, chan=None, db=None):
     """bans -- Lists bans on channel."""
     bans = database.get(db, 'channels', 'bans', 'chan', chan)
-    if bans: notice(u"[{}]: Bans are: {}".format(chan, bans))
-    else: notice(u"[{}]: No nicks/hosts are in the banlist.".format(chan))
+    if bans: notice("[{}]: Bans are: {}".format(chan, bans))
+    else: notice("[{}]: No nicks/hosts are in the banlist.".format(chan))
     return
 
 
@@ -668,7 +668,7 @@ def ban(inp, conn=None, chan=None, notice=None, db=None, nick=None, bot=None):
     if conn.nick in inp_nick or bot.config['owner'] == inp_nick:
         target = nick
         reason = "Your attitude is not conducive to the desired environment"
-        conn.send(u"KICK {} {} :{}".format(chan, target, reason))
+        conn.send("KICK {} {} :{}".format(chan, target, reason))
         return
 
     if len(split) > 1: reason = " ".join(split[1:])
@@ -680,12 +680,12 @@ def ban(inp, conn=None, chan=None, notice=None, db=None, nick=None, bot=None):
     timer = scheduler.check_for_timers(inp, 'ban')
     if timer > 0:
         reason = "{} Come back in {} seconds!!!".format(reason, timer)
-    notice(u"Attempting to ban {} in {}...".format(target, chan))
-    conn.send(u"MODE {} {} {}".format(chan, mode, target))
-    conn.send(u"KICK {} {} :{}".format(chan, inp_nick, reason))
+    notice("Attempting to ban {} in {}...".format(target, chan))
+    conn.send("MODE {} {} {}".format(chan, mode, target))
+    conn.send("KICK {} {} :{}".format(chan, inp_nick, reason))
 
     if timer > 0:
-        notice(u"{} will be unbanned in {} seconds".format(target, timer))
+        notice("{} will be unbanned in {} seconds".format(target, timer))
         scheduler.schedule(timer, 1, "MODE {} -b {}".format(chan, target),
                            conn)
         #scheduler.schedule(timer, 2, "PRIVMSG ChanServ :unban {} {}".format(channel, nick), conn)
@@ -710,11 +710,11 @@ def unban(inp, conn=None, chan=None, notice=None, db=None):
     else: target = nick
     if '@' in target and not '!' in target: target = '*!*{}'.format(target)
     elif '*' in inp or 'all' in inp:
-        notice(u"[{}]: Everyone unbanned".format(chan))
+        notice("[{}]: Everyone unbanned".format(chan))
         database.set(db, 'channels', 'bans', '', 'chan', chan)
         return
-    notice(u"Attempting to unban {} in {}...".format(target, chan))
-    conn.send(u"MODE {} -b {}".format(chan, target))
+    notice("Attempting to unban {} in {}...".format(target, chan))
+    conn.send("MODE {} -b {}".format(chan, target))
     banlist = database.get(db, 'channels', 'bans', 'chan', chan)
     banlist = " ".join(banlist.replace(target, '').strip().split())
     database.set(db, 'channels', 'bans', banlist, 'chan', chan)
@@ -738,8 +738,8 @@ def kick(inp, chan=None, conn=None, notice=None, nick=None, bot=None):
         target = nick
         reason = "Your attitude is not conducive to the desired environment"
 
-    notice(u"Attempting to kick {} from {}...".format(target, chan))
-    conn.send(u"KICK {} {} :{}".format(chan, target, reason))
+    notice("Attempting to kick {} from {}...".format(target, chan))
+    conn.send("KICK {} {} :{}".format(chan, target, reason))
     return
 
 
@@ -823,8 +823,8 @@ def invite(
     throttle = 0
 
     def nestedinvite(user, throttle, sleeptime, users):
-        conn.send(u"INVITE {} {}".format(user, chan))
-        notice(u"Inviting {} to {}...".format(user, chan))
+        conn.send("INVITE {} {}".format(user, chan))
+        notice("Inviting {} to {}...".format(user, chan))
         sleep(sleeptime)
         users.pop(users.index(user))
         throttle += 1
@@ -865,18 +865,18 @@ def invite(
 @hook.command(permissions=["op_rem", "op"], channeladminonly=True)
 def remove(inp, chan=None, conn=None):
     """remove [channel] <user> [message] -- Force a user to part from a channel."""
-    print inp
+    print(inp)
     message = inp
-    conn.send(u"REMOVE {} :{}".format(chan, message))
+    conn.send("REMOVE {} :{}".format(chan, message))
     return
 
 
 @hook.command(adminonly=True)
 def testdamnit(inp, bot=None, conn=None):
     channellist = bot.config["connections"][conn.name]["channels"]
-    print channellist
+    print(channellist)
     channellist2 = list(set(channellist))
-    print channellist2
+    print(channellist2)
     #for target in targets.split(" "):
     #    if not target.startswith("#"):
     #        target = "#{}".format(target)

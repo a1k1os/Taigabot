@@ -1,6 +1,6 @@
 import os
 import sqlite3
-import thread
+import _thread as thread
 
 threaddbs = {}
 

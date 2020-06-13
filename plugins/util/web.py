@@ -45,12 +45,12 @@ def try_isgd(url):
 def haste(text, ext='txt'):
     """ pastes text to a hastebin server """
     page = http.get(paste_url + "/documents", post_data=text)
-    print page
+    print(page)
     data = json.loads(page)
     return ("%s/raw/%s.%s" % (paste_url, data['key'], ext))
 
 
 def query(query, params={}):
     """ runs a YQL query and returns the results """
-    print "[!] deprecation warning: something is trying to use yql"
+    print("[!] deprecation warning: something is trying to use yql")
     return None  # YQL.execute(query, params, env=yql_env)

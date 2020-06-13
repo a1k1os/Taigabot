@@ -34,20 +34,20 @@ def onjoin(paraml, conn=None, bot=None):
             channels2 = conn.channels[len(conn.channels) / 2:]
             conn.join(','.join(channels2))
             time.sleep(1)
-            print conn.channels
-            print channels1
-            print len(channels1)
-            print channels2
-            print len(channels2)
+            print(conn.channels)
+            print(channels1)
+            print(len(channels1))
+            print(channels2)
+            print(len(channels2))
         else:
             conn.join(','.join(conn.channels))
-        print len(conn.channels)
+        print(len(conn.channels))
     except:
         for channel in conn.channels:
             conn.join(channel)
             time.sleep(1)
 
-    print "Bot ready."
+    print("Bot ready.")
 
 
 # Auto-join on Invite (Configurable, defaults to True)
@@ -91,9 +91,9 @@ def onjoined(inp, input=None, conn=None, chan=None, raw=None, db=None):
         # check if bans
         banlist = database.get(db, 'channels', 'bans', 'chan', chan)
         if banlist and mask in banlist:
-            conn.send(u"MODE {} {} *{}".format(input.chan, '+b', mask))
+            conn.send("MODE {} {} *{}".format(input.chan, '+b', mask))
             conn.send(
-                u"KICK {} {} :{}".format(
+                "KICK {} {} :{}".format(
                     input.chan, input.nick, 'I dont think so Tim.'))
 
     if 'autoop' not in disabled_commands:
@@ -105,7 +105,7 @@ def onjoined(inp, input=None, conn=None, chan=None, raw=None, db=None):
             autoops = database.get(db, 'channels', 'autoops', 'chan', chan)
 
         if autoops and mask in autoops:
-            conn.send(u"MODE {} {} {}".format(input.chan, '+o', input.nick))
+            conn.send("MODE {} {} {}".format(input.chan, '+o', input.nick))
 
     if input.nick == "kimi":
         conn.send(
@@ -136,7 +136,7 @@ def onnick(paraml, conn=None, raw=None):
     new_nick = str(paraml[0])
     if old_nick == conn.nick:
         conn.nick = new_nick
-        print "Bot nick changed from '{}' to '{}'.".format(old_nick, new_nick)
+        print("Bot nick changed from '{}' to '{}'.".format(old_nick, new_nick))
 
 
 @hook.event("MODE")
@@ -171,7 +171,7 @@ def onmode(
 
             if len(fixed_modes) > 1:
                 conn.send(
-                    u'MODE {} {} {}'.format(
+                    'MODE {} {} {}'.format(
                         chan, ''.join(fixed_modes), ' '.join(params)))
 
 

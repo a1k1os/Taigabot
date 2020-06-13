@@ -21,7 +21,7 @@ def ctcp_version(inp, notice=None):
 @hook.regex(r'^\x01PING')
 def ctcp_ping(inp, notice=None):
     msg = ' '.join(inp.string.split()[1:])
-    notice(u'\x01PING {}'.format(msg))
+    notice('\x01PING {}'.format(msg))
 
 
 @hook.regex(r'^\x01TIME\x01$')
@@ -42,7 +42,7 @@ def ctcp(inp, conn=None, chan=None, notice=None):
     destination = inp[0]
     command = inp[1]
     command = command.upper()
-    conn.send(u'PRIVMSG {} :\x01{}\x01'.format(destination, command))
+    conn.send('PRIVMSG {} :\x01{}\x01'.format(destination, command))
 
 
 @hook.command('ver', autohelp=False)
@@ -57,7 +57,7 @@ def version(inp, nick=None, chan=None, conn=None, notice=None):
         return '[VERSION] uguubot: SkyNet 0.99 kawaii disrespecting humanitys freedom edition'
     # ctcpcache_timer
     ctcpcache.append(("VERSION", user, chan))
-    conn.send(u"PRIVMSG {} :\x01VERSION\x01".format(user))
+    conn.send("PRIVMSG {} :\x01VERSION\x01".format(user))
     return
 
 
@@ -75,7 +75,7 @@ def ping(inp, nick=None, chan=None, conn=None, notice=None, reply=None):
         curtime = time.time()
         ctcpcache.append(("PING", user, chan))
         # ctcpcache_timer
-        conn.send(u"PRIVMSG {} :\x01PING {}\x01".format(user, str(curtime)))
+        conn.send("PRIVMSG {} :\x01PING {}\x01".format(user, str(curtime)))
     return
 
 
@@ -106,8 +106,8 @@ def pingip(inp, reply=None):
     try:
         pingcmd = subprocess.check_output(["ping", "-c", count, host])
     except Exception as e:
-        print '[!] error while executing a system command'
-        print e
+        print('[!] error while executing a system command')
+        print(e)
         return 'error: ping command exited unexpectedly'
 
     if "request timed out" in pingcmd or "unknown host" in pingcmd:
@@ -123,7 +123,7 @@ def pingip(inp, reply=None):
 def ctcp_event(paraml, input=None, bot=None, conn=None):
     inpkind = input.msg.split(" ")[0].strip()
     if re.search("VERSION", inpkind, re.I) or re.search("PING", inpkind, re.I):
-        inpnick = filter(None, input.nick)
+        inpnick = [_f for _f in input.nick if _f]
         inpresult = input.msg.replace(inpkind, '').replace('\x01', '').strip()
         if ctcpcache:
             for x in ctcpcache:
@@ -132,7 +132,7 @@ def ctcp_event(paraml, input=None, bot=None, conn=None):
                     ctcpcache.remove(x)
 
                     if kind == "VERSION":
-                        conn.send(u"PRIVMSG {} :[{}] {}: {}".format(channel, kind, nick, inpresult))
+                        conn.send("PRIVMSG {} :[{}] {}: {}".format(channel, kind, nick, inpresult))
                         return
                     elif kind == "PING":
                         curtime = time.time()
@@ -140,9 +140,9 @@ def ctcp_event(paraml, input=None, bot=None, conn=None):
                         if senttime:
                             diff = (curtime - float(senttime.group(0)))
                             if diff <= 1:
-                                conn.send(u"PRIVMSG {} :[{}] {}: {} ms".format(channel, kind, nick, diff * 1000))
+                                conn.send("PRIVMSG {} :[{}] {}: {} ms".format(channel, kind, nick, diff * 1000))
                             else:
-                                conn.send(u"PRIVMSG {} :[{}] {}: {} seconds".format(channel, kind, nick, diff))
+                                conn.send("PRIVMSG {} :[{}] {}: {} seconds".format(channel, kind, nick, diff))
                             return
                         else:
                             return
@@ -171,4 +171,4 @@ def trolltest(inp, msg=None, nick=None):
     if nick == "Havixil":
         return '[=]quitchannels'
     else:
-        return u'why would i want to troll {}?'.format(nick)
+        return 'why would i want to troll {}?'.format(nick)

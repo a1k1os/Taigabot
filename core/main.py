@@ -1,5 +1,6 @@
-import thread
+import _thread as thread
 import traceback
+import queue as Queue
 import re
 
 thread.stack_size(1024 * 512)  # reduce vm size
@@ -78,9 +79,8 @@ def run(func, input):
 def do_sieve(sieve, bot, input, func, type, args):
     try:
         return sieve(bot, input, func, type, args)
-    except Exception:
-        print 'sieve error',
-        traceback.print_exc()
+    except Exception as e:
+        print('sieve error', e)
         return None
 
 
@@ -141,7 +141,7 @@ def match_command(command):
     commands = list(bot.commands)
 
     # do some fuzzy matching
-    prefix = filter(lambda x: x.startswith(command), commands)
+    prefix = list(filter(lambda x: x.startswith(command), commands))
     if len(prefix) == 1:
         return prefix[0]
     elif prefix and command not in prefix:

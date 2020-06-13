@@ -77,7 +77,7 @@ def set(db, table, field, value, matchfield, matchvalue):
         pass
     if type(value) is str: value = value.replace("'","").replace('\"', "")
     try:
-	db.execute("ALTER TABLE {} ADD COLUMN {};".format(table, field))
+        db.execute("ALTER TABLE {} ADD COLUMN {};".format(table, field))
     except:
         pass
 

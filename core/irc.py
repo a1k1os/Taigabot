@@ -1,7 +1,7 @@
-import Queue
+import queue as Queue
 import re
 import socket
-import thread
+import _thread as thread
 import time
 from ssl import CERT_NONE, CERT_REQUIRED, SSLError, wrap_socket
 
@@ -28,7 +28,7 @@ class crlf_tcp(object):
     "Handles tcp connections that consist of utf-8 lines ending with crlf"
 
     def __init__(self, host, port, timeout=300):
-        self.ibuffer = ""
+        self.ibuffer = bytearray(b'')
         self.obuffer = ""
         self.oqueue = Queue.Queue()    # lines to be sent out
         self.iqueue = Queue.Queue()    # lines that were received
@@ -38,20 +38,24 @@ class crlf_tcp(object):
         self.timeout = timeout
 
     def create_socket(self):
-        return socket.socket(socket.AF_INET, socket.TCP_NODELAY)
+        # return socket.socket(socket.AF_INET, socket.TCP_NODELAY)
+        return socket.socket()
 
     def run(self):
         try:
             self.socket.connect((self.host, self.port))
-        except:
-            print('Timed out')
-            time.sleep(5)
+        except Exception as e:
+            print('Error creating connection:', e)
+            raise
+            time.sleep(2)
             self.run()
         thread.start_new_thread(self.recv_loop, ())
         thread.start_new_thread(self.send_loop, ())
 
     def recv_from_socket(self, nbytes):
-        return self.socket.recv(nbytes)
+        reading = self.socket.recv(nbytes)
+        print("debug: reading", reading)
+        return reading
 
     def get_timeout_exception_type(self):
         return socket.timeout
@@ -68,6 +72,7 @@ class crlf_tcp(object):
         while True:
             try:
                 data = self.recv_from_socket(4096)
+                print("debug: eggs", type(data), data)
                 self.ibuffer += data
                 if data:
                     last_timestamp = time.time()
@@ -78,21 +83,25 @@ class crlf_tcp(object):
                         return
                     time.sleep(1)
             except (self.get_timeout_exception_type(), socket.error) as e:
+                print("error in recv_loop:", e)
+                raise
                 if self.handle_receive_exception(e, last_timestamp):
                     return
                 continue
 
-            while '\r\n' in self.ibuffer:
-                line, self.ibuffer = self.ibuffer.split('\r\n', 1)
+            while b'\r\n' in self.ibuffer:
+                line, self.ibuffer = self.ibuffer.split(b'\r\n', 1)
                 self.iqueue.put(decode(line))
 
     def send_loop(self):
         while True:
             line = self.oqueue.get().splitlines()[0][:500]
-            print ">>> %r" % line
-            self.obuffer += line.encode('utf-8', 'replace') + '\r\n'
+            # print(">>> %r" % line)
+            self.obuffer = self.obuffer + line + '\r\n'
             while self.obuffer:
-                sent = self.socket.send(self.obuffer)
+                sending = self.obuffer.encode('utf-8')
+                print("debug: sending", sending)
+                sent = self.socket.send(sending)
                 self.obuffer = self.obuffer[sent:]
 
 
@@ -117,7 +126,8 @@ class crlf_ssl_tcp(crlf_tcp):
 
     def handle_receive_exception(self, error, last_timestamp):
         # this is terrible
-        if not "timed out" in error.args[0]:
+        print("error receiving:", error)
+        if not "timed out" in str(error):
             raise
         return crlf_tcp.handle_receive_exception(self, error, last_timestamp)
 
@@ -164,10 +174,12 @@ class IRC(object):
         while True:
             # get a message from the input queue
             msg = self.conn.iqueue.get()
+            print("debug: parse", msg)
 
             if msg == StopIteration:
                 self.connect()
                 continue
+
 
             # parse the message
             if msg.startswith(":"):    # has a prefix
@@ -183,10 +195,12 @@ class IRC(object):
                     paramlist[-1] = paramlist[-1][1:]
                 lastparam = paramlist[-1]
             # put the parsed message in the response queue
-            self.out.put([
+            eggs = [
                 msg, prefix, command, params, nick, user, host, mask,
                 paramlist, lastparam
-            ])
+            ]
+            print("debug: parsed", eggs)
+            self.out.put(eggs)
             # if the server pings us, pong them back
             if command == "PING":
                 self.cmd("PONG", paramlist)
